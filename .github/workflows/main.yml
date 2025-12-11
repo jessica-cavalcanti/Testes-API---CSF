@@ -1,0 +1,31 @@
+name: Postman API Tests
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Newman
+        run: npm install -g newman newman-reporter-htmlextra
+
+      - name: Run tests
+        run: |
+          newman run collection/Usuarios.postman_collection.json \
+            -e environment/Serverest.postman_environment.json \
+            -r htmlextra \
+            --reporter-htmlextra-export reports/index.html
+
+      - name: Upload Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: api-report
+          path: reports/index.html
